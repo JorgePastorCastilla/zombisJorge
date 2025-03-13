@@ -8,6 +8,10 @@ public class EnemyManager : MonoBehaviour
 
     public GameObject player;
     public Animator enemyAnimator;
+    public GameManager gameManager;
+    
+    public float damage = 20f;
+    public float health = 100f;
     // Start is called before the first frame update
     void Start()
     {
@@ -37,7 +41,24 @@ public class EnemyManager : MonoBehaviour
         if(collision.gameObject == player)
         {
             Debug.Log("L'enemic m'ataca!!");
+            player.GetComponent<PlayerManager>().Hit(damage);
         }
+    }
+
+    public void Hit(float damage)
+    {
+        health -= damage;
+        Debug.Log("Enemy got hit!");
+        if (health <= 0)
+        {
+            // Destrium a l'enemic quan la seva salut arriba a zero
+            // feim referència a ell amb la variable gameObject, que fa referència al GO
+            // que conté el componentn EnemyManager
+            gameManager.enemiesAlive--;
+            Destroy(gameObject);
+            
+        }
+
     }
 
 }
