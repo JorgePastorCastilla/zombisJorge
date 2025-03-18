@@ -96,8 +96,18 @@ public class EnemyManager : MonoBehaviour
             // feim referència a ell amb la variable gameObject, que fa referència al GO
             // que conté el componentn EnemyManager
             gameManager.enemiesAlive--;
-            Destroy(gameObject);
+            // Destroy(gameObject);
+            enemyAnimator.SetTrigger("isDead");
+            Destroy(gameObject,10f);
+            Destroy(GetComponent<NavMeshAgent>());
+            Destroy(GetComponent<EnemyManager>());
+            // Destroy(GetComponent<CapsuleCollider>());
+            foreach (var capsuleCollider in gameObject.GetComponents<CapsuleCollider>())
+            {
+                Destroy(capsuleCollider);
+            }
             
+
         }
 
     }

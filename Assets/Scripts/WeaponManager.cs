@@ -5,11 +5,14 @@ using UnityEngine;
 public class WeaponManager : MonoBehaviour
 {
     public GameObject playerCam; // Fa referència a la càmera del jugador FPS
-    public float range = 15f; // Fins on volem que arribin els tirs
+    public float range = 30f; // Fins on volem que arribin els tirs
 
     public float damage = 25f;
 
     public Animator playerAnimator;
+    
+    public ParticleSystem FlashParticleSystem;
+    public GameObject BloodParticleSystem;
     // Start is called before the first frame update
     void Start()
     {
@@ -35,6 +38,7 @@ public class WeaponManager : MonoBehaviour
     public void Shoot()
     {
         playerAnimator.SetBool("isShooting", true);
+        FlashParticleSystem.Play();
         RaycastHit hit;
         if (Physics.Raycast(playerCam.transform.position, transform.forward, out hit, range))
         {
@@ -43,6 +47,9 @@ public class WeaponManager : MonoBehaviour
             EnemyManager enemyManager = hit.transform.GetComponent<EnemyManager>();
             if (enemyManager != null)
             {
+                GameObject particleInstance = Instantiate(BloodParticleSystem, hit.point, Quaternion.LookRotation(hit.normal));
+                particleInstance.transform.parent = hit.transform;
+                particleInstance.GetComponent<ParticleSystem>().Play();
                 enemyManager.Hit(damage);
             }
         }
