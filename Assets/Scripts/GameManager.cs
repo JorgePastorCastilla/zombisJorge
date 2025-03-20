@@ -1,9 +1,11 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour
 {
@@ -18,13 +20,34 @@ public class GameManager : MonoBehaviour
 
     public Image HpBar;
     public TextMeshProUGUI RoundText;
+    public TextMeshProUGUI RoundsSurvivedText;
     
     public GameObject pausePanel;
     public GameObject gameOverPanel;
-    // Start is called before the first frame update
+
+    public bool isPaused;
+    public bool isGameOver;
+    
+    
+    public static GameManager sharedInstance;
+
+    private void Awake()
+    {
+        if (sharedInstance == null)
+        {
+            sharedInstance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
     void Start()
     {
-        
+        isPaused = false;
+        isGameOver = false;
+        Time.timeScale = 1;
     }
 
     // Update is called once per frame
@@ -87,6 +110,7 @@ public class GameManager : MonoBehaviour
         pausePanel.SetActive(true);
         Time.timeScale = 0;
         Cursor.lockState = CursorLockMode.None;
+        isPaused = true;
     }
 
     public void Resume()
@@ -94,6 +118,7 @@ public class GameManager : MonoBehaviour
         pausePanel.SetActive(false);
         Time.timeScale = 1;
         Cursor.lockState = CursorLockMode.Locked;
+        isPaused = false;
     }
 
     public void GameOver()
@@ -101,5 +126,8 @@ public class GameManager : MonoBehaviour
         gameOverPanel.SetActive(true);
         Time.timeScale = 0;
         Cursor.lockState = CursorLockMode.None;
+        RoundsSurvivedText.text = (round - 1).ToString();
+        
+        isGameOver = true;
     }
 }

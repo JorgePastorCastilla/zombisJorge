@@ -10,7 +10,9 @@ public class PlayerMovement : MonoBehaviour
     public CharacterController controller;
     public float gravity = -9.81f;
     public Vector3 velocity;
-    private float speed = 5f;
+    private float speed;
+    public float walkSpeed = 5f;
+    public float runSpeed = 10f;
 
     // GroundCheck
     public bool isGrounded;
@@ -32,6 +34,14 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetButton("Fire3") && isGrounded)
+        {
+            speed = runSpeed;
+        }
+        else
+        {
+            speed = walkSpeed;
+        }
         float horizontal = Input.GetAxis("Horizontal");
         float vertical = Input.GetAxis("Vertical");
         Vector3 move = transform.right * horizontal + transform.forward * vertical;

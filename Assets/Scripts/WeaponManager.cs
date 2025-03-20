@@ -13,6 +13,8 @@ public class WeaponManager : MonoBehaviour
     
     public ParticleSystem FlashParticleSystem;
     public GameObject BloodParticleSystem;
+    
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -22,15 +24,19 @@ public class WeaponManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (playerAnimator.GetBool("isShooting"))
+        if (!GameManager.sharedInstance.isGameOver && !GameManager.sharedInstance.isPaused)
         {
-            playerAnimator.SetBool("isShooting", false);
-        }
+            if (playerAnimator.GetBool("isShooting"))
+            {
+                playerAnimator.SetBool("isShooting", false);
+            }
 
-        if (Input.GetButtonDown("Fire1"))
-        {
-            Shoot();
+            if (Input.GetButtonDown("Fire1"))
+            {
+                Shoot();
+            } 
         }
+        
 
 
     }
