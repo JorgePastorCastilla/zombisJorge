@@ -19,7 +19,7 @@ public class MainMenuManager : MonoBehaviour
 
     public void StartGame()
     {
-        SceneManager.LoadScene(0);
+        SceneManager.LoadScene("Game");
     }
 
     public void QuitGame()
@@ -27,5 +27,10 @@ public class MainMenuManager : MonoBehaviour
         Application.Quit();
         //TODO THIS LAST LINE OF CODE ONLY WORKS FOR UNITY EDITOR AND SHOULD BE REMOVE BEFORE THE FINAL BUILD OF THE PROJECT
         UnityEditor.EditorApplication.isPlaying = false;
+    }
+
+    public void LoadMultiplayerMenu()
+    {
+        SceneManager.LoadScene("MultiplayerMenu");
     }
 }

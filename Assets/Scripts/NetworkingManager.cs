@@ -47,14 +47,19 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
     public void MakeRoom()
     {
      RoomOptions roomOptions = new RoomOptions() { IsVisible = true, IsOpen = true, MaxPlayers = 6, PublishUserId = true};
-     var randomRoomName = 1;
+     int randomRoomName = Random.Range(0, 5000);
      PhotonNetwork.CreateRoom($"RoomName_{randomRoomName}", roomOptions);
     }
 
     public override void OnJoinedRoom()
     {
-        PhotonNetwork.LoadLevel(2);
+        PhotonNetwork.LoadLevel("Game Multiplayer");
         
         // base.OnJoinedRoom();
+    }
+
+    public void BackToMainMenu()
+    {
+        SceneManager.LoadScene("MainMenu");
     }
 }
