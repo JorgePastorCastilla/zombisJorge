@@ -51,6 +51,14 @@ public class WeaponManager : MonoBehaviour
 
     public void Shoot()
     {
+        if (PhotonNetwork.InRoom)
+        {
+            photonView.RPC("WeaponShootVFX", RpcTarget.All, photonView.ViewID);
+        }
+        else
+        {
+            ShootVFX(3);
+        }
         playerAnimator.SetBool("isShooting", true);
         FlashParticleSystem.Play();
         RaycastHit hit;
@@ -68,5 +76,14 @@ public class WeaponManager : MonoBehaviour
             }
         }
 
+    }
+
+    public void ShootVFX(int viewID)
+    {
+        if (!PhotonNetwork.InRoom || photonView.ViewID == viewID)
+        {
+            FlashParticleSystem.Play();
+            //sonido
+        }
     }
 }

@@ -20,6 +20,8 @@ public class PlayerManager : MonoBehaviour
     public CanvasGroup hitPanel;
 
     public PhotonView photonView;
+
+    public GameObject activeWeapon;
     // Start is called before the first frame update
     void Start()
     {
@@ -91,6 +93,12 @@ public class PlayerManager : MonoBehaviour
     public void CameraShake()
     {
         playerCamera.transform.localRotation = Quaternion.Euler(Random.Range(-2f, 2f), 0, 0);
+    }
+
+    [PunRPC]
+    public void WeaponShootVFX(int viewID)
+    {
+        activeWeapon.GetComponent<WeaponManager>().ShootVFX(viewID);
     }
 
 }

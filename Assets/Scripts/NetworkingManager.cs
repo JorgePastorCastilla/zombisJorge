@@ -13,8 +13,24 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
     // Start is called before the first frame update
     void Start()
     {
+        if (PhotonNetwork.IsConnected)
+        {
+            StartCoroutine(DisconnectPlayer() );
+        }
         PhotonNetwork.ConnectUsingSettings();
     }
+
+    IEnumerator DisconnectPlayer()
+    {
+        PhotonNetwork.LeaveRoom();
+        PhotonNetwork.Disconnect();
+        while (PhotonNetwork.IsConnected)
+        {
+            yield return null;
+        }
+    }
+    
+    
 
     // Update is called once per frame
     void Update()
@@ -60,6 +76,7 @@ public class NetworkingManager : MonoBehaviourPunCallbacks
 
     public void BackToMainMenu()
     {
+        PhotonNetwork.Disconnect();
         SceneManager.LoadScene("MainMenu");
     }
 }
