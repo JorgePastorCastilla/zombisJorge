@@ -1,13 +1,16 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
+using Photon.Realtime;
+using Hashtable = ExitGames.Client.Photon.Hashtable;
 
-public class GameManager : MonoBehaviour
+public class GameManager : MonoBehaviourPunCallbacks
 {
     
     public int enemiesAlive;
@@ -28,21 +31,8 @@ public class GameManager : MonoBehaviour
     public bool isPaused;
     public bool isGameOver;
     
+    public PhotonView photonView;
     
-    public static GameManager sharedInstance;
-
-    private void Awake()
-    {
-        if (sharedInstance == null)
-        {
-            sharedInstance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-    }
-
     void Start()
     {
         isPaused = false;
@@ -55,10 +45,15 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (enemiesAlive <= 0)
+
+        if ( !PhotonNetwork.InRoom || ( PhotonNetwork.IsMasterClient && photonView.IsMine ) )
         {
-            NextWave();
+            if (enemiesAlive <= 0)
+            {
+                NextWave();
+            }
         }
+        
 
         if (Input.GetKeyDown(KeyCode.Escape) && !gameOverPanel.activeSelf)
         {
@@ -80,15 +75,32 @@ public class GameManager : MonoBehaviour
         int max = spawnPoints.Length - 1;
 
         round++;
-        RoundText.text = round.ToString();
+        if (PhotonNetwork.InRoom)
+        {
+            Hashtable hash = new Hashtable();
+            hash.Add("RoundNumber", round);
+            PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
+        }
+        else
+        {
+            DisplayNextRound( round.ToString() );    
+        }
+        
         for (int i = 0; i < round; i++)
         {
             int index = Random.Range(min, max);
         
             GameObject selectedSpawn = spawnPoints[index];
 
-            GameObject zombi = Instantiate(enemyPrefab, selectedSpawn.transform.position, Quaternion.identity);
-            
+            GameObject zombi;
+            if (PhotonNetwork.InRoom)
+            {
+                zombi = PhotonNetwork.Instantiate("Zombie", selectedSpawn.transform.position, Quaternion.identity);;
+            }
+            else
+            {
+                zombi = Instantiate(enemyPrefab, selectedSpawn.transform.position, Quaternion.identity);
+            }
             zombi.GetComponent<EnemyManager>().gameManager = this;
             enemiesAlive++;
         }
@@ -131,5 +143,21 @@ public class GameManager : MonoBehaviour
         RoundsSurvivedText.text = (round - 1).ToString();
         
         isGameOver = true;
+    }
+
+    private void DisplayNextRound(string roundNumber)
+    {
+        RoundText.text = roundNumber;
+    }
+
+    public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
+    {
+        if (photonView.IsMine)
+        {
+            if (changedProps["RoundNumber"] != null)
+            {
+                DisplayNextRound( (string) changedProps["RoundNumber"] );
+            }
+        }
     }
 }

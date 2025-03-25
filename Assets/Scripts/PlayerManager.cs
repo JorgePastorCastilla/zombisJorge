@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -18,15 +19,24 @@ public class PlayerManager : MonoBehaviour
     private Quaternion playerCameraOriginalRotation;
     public CanvasGroup hitPanel;
 
+    public PhotonView photonView;
     // Start is called before the first frame update
     void Start()
     {
         health = maxHealth;
+        playerCameraOriginalRotation = playerCamera.transform.localRotation;
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (PhotonNetwork.InRoom && !photonView.IsMine)
+        {
+            playerCamera.SetActive(false);
+            return;
+        }
+        
+        
         if(shakeTime < shakeDuration)
         {
             shakeTime += Time.deltaTime;

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
 public class MouseLook : MonoBehaviour
 {
@@ -10,6 +11,8 @@ public class MouseLook : MonoBehaviour
         private float xRotation = 0f;
         private float yRotation = 0f;
         // Start is called before the first frame update
+        
+        public PhotonView photonView;
         void Start()
         {
             Cursor.visible = false;
@@ -19,7 +22,10 @@ public class MouseLook : MonoBehaviour
         // Update is called once per frame
         void Update()
         {
-            
+            if (PhotonNetwork.InRoom && !photonView.IsMine)
+            {
+                return;
+            }
             float mouseX = Input.GetAxis("Mouse X") * Time.deltaTime * cameraSpeed;
             // playerTransform.Rotate(Vector3.up * mouseX);
             yRotation += mouseX;

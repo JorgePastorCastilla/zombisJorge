@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
@@ -24,18 +25,31 @@ public class EnemyManager : MonoBehaviour
     public float howMuchEarlierStartAttackAnimation = 1f; // inicialitzarem a 1f
     public float delayBetweenAttacks = 0.6f; // inicialitzarem a 0.6f
 
+
+    private GameObject[] playersInScene;
     // Start is called before the first frame update
     void Start()
     {
         health = maxHealth;
         player = GameObject.FindGameObjectWithTag("Player");
+        playersInScene = GameObject.FindGameObjectsWithTag("Player");
     }
 
     // Update is called once per frame
     void Update()
     {
-        GetComponent<NavMeshAgent>().destination = player.transform.position;
+        //audio va aqui
+        
+        if (PhotonNetwork.InRoom && !PhotonNetwork.IsMasterClient)
+        {
+            return;
+        }
 
+        GetClosestPlayer();
+        if (player != null)
+        {
+            GetComponent<NavMeshAgent>().destination = player.transform.position;
+        }
         // En primer lloc hem d'accedir a la velocitat del Zombiem, des del component NavMeshAgent
         if (GetComponent<NavMeshAgent>().velocity.magnitude > 1)
         {
@@ -110,6 +124,25 @@ public class EnemyManager : MonoBehaviour
 
         }
 
+    }
+
+    private void GetClosestPlayer()
+    {
+        float mindistance = Mathf.Infinity;
+        Vector3 currentPosition = transform.position;
+
+        foreach (GameObject p in playersInScene)
+        {
+            if (p != null)
+            {
+                float distance = Vector3.Distance(p.transform.position, currentPosition);
+                if (distance < mindistance)
+                {
+                    player = p;
+                    mindistance = distance;
+                }
+            }
+        }
     }
 
 }
