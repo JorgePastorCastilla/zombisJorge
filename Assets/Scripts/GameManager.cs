@@ -37,7 +37,10 @@ public class GameManager : MonoBehaviourPunCallbacks
     {
         isPaused = false;
         isGameOver = false;
-        Time.timeScale = 1;
+        if (!PhotonNetwork.InRoom)
+        {
+            Time.timeScale = 1;
+        }
         
         spawnPoints = GameObject.FindGameObjectsWithTag("Spawner");
     }
@@ -83,7 +86,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         }
         else
         {
-            DisplayNextRound( round.ToString() );    
+            DisplayNextRound( round );    
         }
         
         for (int i = 0; i < round; i++)
@@ -108,21 +111,42 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     public void RestartGame()
     {
-        Time.timeScale = 1;
-        SceneManager.LoadScene("Game");
+        if (!PhotonNetwork.InRoom)
+        {
+            Time.timeScale = 1;
+            SceneManager.LoadScene("Game");
+        }
+        else
+        {
+            SceneManager.LoadScene("Game Multiplayer");
+
+        }
+        
         
     }
 
     public void BackToMainMenu()
     {
-        Time.timeScale = 1;
-        SceneManager.LoadScene("MainMenu");
+        if (!PhotonNetwork.InRoom)
+        {
+            Time.timeScale = 1;
+            SceneManager.LoadScene("MainMenu");
+        }
+        else
+        {
+            SceneManager.LoadScene("MultiplayerMenu");
+        }
+        
+        
     }
 
     public void Pause()
     {
         pausePanel.SetActive(true);
-        Time.timeScale = 0;
+        if (!PhotonNetwork.InRoom)
+        {
+            Time.timeScale = 0;
+        }
         Cursor.lockState = CursorLockMode.None;
         isPaused = true;
     }
@@ -130,7 +154,10 @@ public class GameManager : MonoBehaviourPunCallbacks
     public void Resume()
     {
         pausePanel.SetActive(false);
-        Time.timeScale = 1;
+        if (!PhotonNetwork.InRoom)
+        {
+            Time.timeScale = 1;
+        }
         Cursor.lockState = CursorLockMode.Locked;
         isPaused = false;
     }
@@ -138,16 +165,20 @@ public class GameManager : MonoBehaviourPunCallbacks
     public void GameOver()
     {
         gameOverPanel.SetActive(true);
-        Time.timeScale = 0;
+        if (!PhotonNetwork.InRoom)
+        {
+            Time.timeScale = 0;
+        }
         Cursor.lockState = CursorLockMode.None;
         RoundsSurvivedText.text = (round - 1).ToString();
         
         isGameOver = true;
     }
 
-    private void DisplayNextRound(string roundNumber)
+    private void DisplayNextRound(int roundNumber)
     {
-        RoundText.text = roundNumber;
+        round = roundNumber;
+        RoundText.text = roundNumber.ToString();
     }
 
     public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
@@ -156,7 +187,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         {
             if (changedProps["RoundNumber"] != null)
             {
-                DisplayNextRound( (string) changedProps["RoundNumber"] );
+                DisplayNextRound( (int) changedProps["RoundNumber"] );
             }
         }
     }

@@ -2009,6 +2009,7 @@ MonoBehaviour:
   attackDelayTimer: 0
   howMuchEarlierStartAttackAnimation: 1
   delayBetweenAttacks: 0.6
+  photonView: {fileID: 5370079916795384241}
 --- !u!82 &5205456087509766976
 AudioSource:
   m_ObjectHideFlags: 0
@@ -2125,6 +2126,7 @@ MonoBehaviour:
   observableSearch: 2
   ObservedComponents:
   - {fileID: 939505938901279020}
+  - {fileID: 6749411682931335416}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0

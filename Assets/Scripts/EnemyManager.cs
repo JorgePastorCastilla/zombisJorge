@@ -27,6 +27,8 @@ public class EnemyManager : MonoBehaviour
 
 
     private GameObject[] playersInScene;
+    
+    public PhotonView photonView;
     // Start is called before the first frame update
     void Start()
     {
@@ -101,29 +103,40 @@ public class EnemyManager : MonoBehaviour
 
     public void Hit(float damage)
     {
-        health -= damage;
-        Debug.Log("Enemy got hit!");
-        HpBar.fillAmount = health / maxHealth;
-        if (health <= 0)
+        photonView.RPC("TakeDamage", RpcTarget.All, damage, photonView.ViewID);
+    }
+
+    
+    [PunRPC]
+    public void TakeDamage(float damage, int viewID)
+    {
+        if (photonView.ViewID == viewID)
         {
-            // Destrium a l'enemic quan la seva salut arriba a zero
-            // feim referència a ell amb la variable gameObject, que fa referència al GO
-            // que conté el componentn EnemyManager
-            gameManager.enemiesAlive--;
-            // Destroy(gameObject);
-            enemyAnimator.SetTrigger("isDead");
-            Destroy(gameObject,10f);
-            Destroy(GetComponent<NavMeshAgent>());
-            Destroy(GetComponent<EnemyManager>());
-            // Destroy(GetComponent<CapsuleCollider>());
-            foreach (var capsuleCollider in gameObject.GetComponents<CapsuleCollider>())
+            health -= damage;
+            Debug.Log("Enemy got hit!");
+            HpBar.fillAmount = health / maxHealth;
+            if (health <= 0)
             {
-                Destroy(capsuleCollider);
+                // Destrium a l'enemic quan la seva salut arriba a zero
+                // feim referència a ell amb la variable gameObject, que fa referència al GO
+                // que conté el componentn EnemyManager
+                // Destroy(gameObject);
+                enemyAnimator.SetTrigger("isDead");
+                Destroy(gameObject,10f);
+                Destroy(GetComponent<NavMeshAgent>());
+                Destroy(GetComponent<EnemyManager>());
+                // Destroy(GetComponent<CapsuleCollider>());
+                foreach (var capsuleCollider in gameObject.GetComponents<CapsuleCollider>())
+                {
+                    Destroy(capsuleCollider);
+                }
+
+                if (!PhotonNetwork.InRoom || ( PhotonNetwork.IsMasterClient && photonView.IsMine) )
+                {
+                    gameManager.enemiesAlive--;
+                }
             }
-            
-
         }
-
     }
 
     private void GetClosestPlayer()
