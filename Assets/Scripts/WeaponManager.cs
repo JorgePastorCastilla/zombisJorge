@@ -1,9 +1,12 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using ExitGames.Client.Photon;
 using Photon.Pun;
+using Photon.Realtime;
 using UnityEngine;
 
-public class WeaponManager : MonoBehaviour
+public class WeaponManager : MonoBehaviour, IOnEventCallback
 {
     public GameObject playerCam; // Fa referència a la càmera del jugador FPS
     public float range = 30f; // Fins on volem que arribin els tirs
@@ -17,6 +20,8 @@ public class WeaponManager : MonoBehaviour
     
     public PhotonView photonView;
     public GameManager gameManager;
+
+    public const byte VFX_EVENT = 0;
     // Start is called before the first frame update
     void Start()
     {
@@ -53,7 +58,13 @@ public class WeaponManager : MonoBehaviour
     {
         if (PhotonNetwork.InRoom)
         {
-            photonView.RPC("WeaponShootVFX", RpcTarget.All, photonView.ViewID);
+            // photonView.RPC("WeaponShootVFX", RpcTarget.All, photonView.ViewID);
+            int viewID = photonView.ViewID;
+            
+            RaiseEventOptions raiseOptions = new RaiseEventOptions { Receivers = ReceiverGroup.All };
+            SendOptions sendOptions = new SendOptions { Reliability = true };
+
+            PhotonNetwork.RaiseEvent(VFX_EVENT, viewID, raiseOptions, sendOptions);
         }
         else
         {
@@ -85,5 +96,24 @@ public class WeaponManager : MonoBehaviour
             FlashParticleSystem.Play();
             //sonido
         }
+    }
+
+    void IOnEventCallback.OnEvent(EventData photonEvent)
+    {
+        if (photonEvent.Code == VFX_EVENT)
+        {
+            int viewID = (int) photonEvent.CustomData;
+            ShootVFX(viewID);
+        }
+    }
+
+    private void OnEnable()
+    {
+        PhotonNetwork.AddCallbackTarget(this);
+    }
+
+    private void OnDisable()
+    {
+        PhotonNetwork.RemoveCallbackTarget(this);
     }
 }

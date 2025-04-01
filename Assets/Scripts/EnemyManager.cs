@@ -143,7 +143,8 @@ public class EnemyManager : MonoBehaviour
     {
         float mindistance = Mathf.Infinity;
         Vector3 currentPosition = transform.position;
-
+        playersInScene = GameObject.FindGameObjectsWithTag("Player");
+        
         foreach (GameObject p in playersInScene)
         {
             if (p != null)
